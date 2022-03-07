@@ -5,6 +5,7 @@ import (
 	"CRUD-Chat-Test-Task/internal/core/interfaces"
 	"CRUD-Chat-Test-Task/internal/core/model"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -48,35 +49,33 @@ func (r *chatRepository) CreateChat(chatEntity *entity.Chat) error {
 }
 
 func (r *chatRepository) AddMessage(messageEntity *entity.Message) error {
-	chatEntity := entity.Chat{}
+	//chatEntity := entity.Chat{}
 	chat := model.Chat{}
+	//userEntity := entity.User{}
 	user := model.User{}
 	message := model.Message{}
 	userId := uuid.New()
 
-	db := r.db.Where("chat_name = ?", messageEntity.ChatName).First(&chatEntity)
+	db := r.db.Where("chat_name = ?", messageEntity.ChatName).First(&chat)
 	if db.Error != nil {
 		return errors.New("chat not found")
 	}
-	message.ChatID = chatEntity.ID
+	message.ChatID = chat.ID
 
 	db = r.db.Where("name = ?", messageEntity.MessageAuthor).Limit(1).First(&user)
 	if db.RowsAffected == 0 {
 		user.ID = userId
-		user.Name = chatEntity.ChatAuthor
+		user.Name = messageEntity.MessageAuthor
+		fmt.Println("11111")
 		r.db.Create(&user)
 		message.AuthorID = userId
 	} else {
 		message.AuthorID = user.ID
-		chat.ID = uuid.New()
-		chat.AuthorID = user.ID
-		chat.ChatName = chatEntity.ChatName
-		db = r.db.Create(&chat)
 	}
 
 	message.MessageText = messageEntity.MessageText
-
 	db = r.db.Create(&message)
+	fmt.Println("11111")
 	if db.Error != nil {
 		return db.Error
 	}
