@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateChat(c *gin.Context) {
+func AddMessage(c *gin.Context) {
 	usecase := *c.MustGet("usecase").(*interfaces.Usecase)
 	chat := entity.Chat{}
 	err := c.ShouldBindJSON(&chat)

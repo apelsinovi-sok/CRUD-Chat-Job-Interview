@@ -4,8 +4,8 @@
 
 CREATE TABLE chats (
     id INT GENERATED ALWAYS AS IDENTITY,
-    name VARCHAR(250),
-    author VARCHAR(250),
+    chat_name VARCHAR(250),
+    chat_author VARCHAR(250),
     PRIMARY KEY(id)
 );
 
