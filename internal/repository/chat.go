@@ -3,7 +3,9 @@ package repository
 import (
 	"CRUD-Chat-Test-Task/internal/core/entity"
 	"CRUD-Chat-Test-Task/internal/core/interfaces"
+	"CRUD-Chat-Test-Task/internal/core/model"
 	"errors"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -15,8 +17,23 @@ func NewChatRepository(db *gorm.DB) interfaces.ChatRepository {
 	return &chatRepository{db: db}
 }
 
-func (r *chatRepository) CreateChat(chat *entity.Chat) error {
-	db := r.db.Create(chat)
+func (r *chatRepository) CreateChat(chatEntity *entity.Chat) error {
+	user := model.User{}
+	chat := model.Chat{}
+	userId := uuid.New()
+	//Поиск юзера по нику. Если не нашел, создать юзера
+	db := r.db.Where("name = ?", chatEntity.ChatAuthor).Limit(1).First(&user)
+	if db.RowsAffected == 0 {
+		user.ID = userId
+		user.Name = chatEntity.ChatAuthor
+		r.db.Create(&user)
+	}
+	//Записать все данные из сущности в модель, для разбиения сущности на таблицы
+	chat.ID = uuid.New()
+	chat.AuthorID = userId
+	chat.ChatName = chatEntity.ChatName
+	db = r.db.Create(&chat)
+
 	if db.Error != nil {
 		return db.Error
 	}
