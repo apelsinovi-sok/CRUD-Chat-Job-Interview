@@ -47,16 +47,36 @@ func (r *chatRepository) CreateChat(chatEntity *entity.Chat) error {
 	return nil
 }
 
-func (r *chatRepository) AddMessage(message *entity.Message) error {
-	chat := entity.Chat{}
+func (r *chatRepository) AddMessage(messageEntity *entity.Message) error {
+	chatEntity := entity.Chat{}
+	chat := model.Chat{}
+	user := model.User{}
+	message := model.Message{}
+	userId := uuid.New()
 
-	db := r.db.Where(&entity.Chat{ChatName: message.ChatName}).First(&chat)
+	db := r.db.Where("chat_name = ?", messageEntity.ChatName).First(&chatEntity)
 	if db.Error != nil {
 		return errors.New("chat not found")
 	}
-	message.ChatID = chat.ID
+	message.ChatID = chatEntity.ID
 
-	db = r.db.Create(message)
+	db = r.db.Where("name = ?", messageEntity.MessageAuthor).Limit(1).First(&user)
+	if db.RowsAffected == 0 {
+		user.ID = userId
+		user.Name = chatEntity.ChatAuthor
+		r.db.Create(&user)
+		message.AuthorID = userId
+	} else {
+		message.AuthorID = user.ID
+		chat.ID = uuid.New()
+		chat.AuthorID = user.ID
+		chat.ChatName = chatEntity.ChatName
+		db = r.db.Create(&chat)
+	}
+
+	message.MessageText = messageEntity.MessageText
+
+	db = r.db.Create(&message)
 	if db.Error != nil {
 		return db.Error
 	}
