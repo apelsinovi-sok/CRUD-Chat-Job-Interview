@@ -8,14 +8,14 @@ import (
 
 func AddMessage(c *gin.Context) {
 	usecase := *c.MustGet("usecase").(*interfaces.Usecase)
-	chat := entity.Chat{}
-	err := c.ShouldBindJSON(&chat)
+	message := entity.Message{}
+	err := c.ShouldBindJSON(&message)
 	if err != nil {
 		c.JSON(BadRequestHttpResponse(err))
 		return
 	}
 
-	err = usecase.CreateChat(chat)
+	err = usecase.AddMessage(message)
 	if err != nil {
 		c.JSON(BadRequestHttpResponse(err))
 		return
