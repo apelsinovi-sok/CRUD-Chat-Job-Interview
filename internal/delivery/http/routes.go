@@ -9,4 +9,5 @@ func (s *httpServer) setRoutes() {
 func (s *httpServer) setApi() {
 	s.router.POST("/create", internal.CreateChat)
 	s.router.POST("/add-message", internal.AddMessage)
+	s.router.GET("/chat/:name/:limit", internal.GetListMessages)
 }

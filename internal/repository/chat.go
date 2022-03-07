@@ -42,3 +42,24 @@ func (r chatRepository) AddMessage(message *entity.Message) error {
 	}
 	return nil
 }
+
+func (r chatRepository) GetListMessages(chatName string, limit int) (entity.ListIdMessages, error) {
+	chat := entity.Chat{}
+	ListIdMessages := entity.ListIdMessages{}
+	db := r.db.Where("chat_name  = ?", chatName).First(&chat)
+	if db.Error != nil {
+		return nil, errors.New("chat not found")
+	}
+	db = r.db.Preload("Messages", func(db *gorm.DB) *gorm.DB {
+		return db.Where("chat_id = ?", chat.ID).Limit(limit).Order("messages.id DESC")
+	}).Find(&chat)
+	if db.Error != nil {
+		return nil, db.Error
+	}
+
+	for i, v := range chat.Messages {
+		ListIdMessages[i] = v.ID
+	}
+	fmt.Println(ListIdMessages)
+	return ListIdMessages, nil
+}
