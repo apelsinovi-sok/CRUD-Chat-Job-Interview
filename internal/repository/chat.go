@@ -21,18 +21,25 @@ func (r *chatRepository) CreateChat(chatEntity *entity.Chat) error {
 	user := model.User{}
 	chat := model.Chat{}
 	userId := uuid.New()
-	//Поиск юзера по нику. Если не нашел, создать юзера
+	//Поиск юзера по нику. Если не нашел, создать юзера и создать чат, связать их общим id
 	db := r.db.Where("name = ?", chatEntity.ChatAuthor).Limit(1).First(&user)
 	if db.RowsAffected == 0 {
 		user.ID = userId
 		user.Name = chatEntity.ChatAuthor
 		r.db.Create(&user)
+
+		//Записать все данные из сущности в модель, для разбиения сущности на таблицы
+		chat.ID = uuid.New()
+		chat.AuthorID = userId
+		chat.ChatName = chatEntity.ChatName
+		db = r.db.Create(&chat)
+		//В противном случае создать чат, достать id юзера и прикрепить его к чату
+	} else {
+		chat.ID = uuid.New()
+		chat.AuthorID = user.ID
+		chat.ChatName = chatEntity.ChatName
+		db = r.db.Create(&chat)
 	}
-	//Записать все данные из сущности в модель, для разбиения сущности на таблицы
-	chat.ID = uuid.New()
-	chat.AuthorID = userId
-	chat.ChatName = chatEntity.ChatName
-	db = r.db.Create(&chat)
 
 	if db.Error != nil {
 		return db.Error
