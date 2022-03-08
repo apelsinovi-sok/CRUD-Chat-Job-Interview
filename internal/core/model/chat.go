@@ -6,4 +6,5 @@ type Chat struct {
 	ID       uuid.UUID
 	ChatName string
 	AuthorID uuid.UUID
+	Messages []Message
 }

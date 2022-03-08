@@ -3,6 +3,7 @@ package model
 import "github.com/google/uuid"
 
 type User struct {
-	ID   uuid.UUID
-	Name string
+	ID       uuid.UUID
+	Name     string
+	Messages []Message `gorm:"foreignKey:AuthorID"`
 }

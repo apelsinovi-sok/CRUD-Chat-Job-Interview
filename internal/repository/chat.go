@@ -29,12 +29,12 @@ func (r *chatRepository) CreateChat(chatEntity *entity.Chat) error {
 		user.Name = chatEntity.ChatAuthor
 		r.db.Create(&user)
 
-		//Записать все данные из сущности в модель, для разбиения сущности на таблицы
+		//Записать все данные из сущности в модель юзер и чат, для разбиения сущности на таблицы юзер и чат
 		chat.ID = uuid.New()
 		chat.AuthorID = userId
 		chat.ChatName = chatEntity.ChatName
 		db = r.db.Create(&chat)
-		//В противном случае создать чат, достать id юзера и прикрепить его к чату
+		//В противном случае записать данные из сущности только в модель чат, не создавая нового юзера. Достать id юзера и прикрепить его к чату
 	} else {
 		chat.ID = uuid.New()
 		chat.AuthorID = user.ID
@@ -55,27 +55,28 @@ func (r *chatRepository) AddMessage(messageEntity *entity.Message) error {
 	user := model.User{}
 	message := model.Message{}
 	userId := uuid.New()
-
+	//Поиск чата по названию
 	db := r.db.Where("chat_name = ?", messageEntity.ChatName).First(&chat)
 	if db.Error != nil {
 		return errors.New("chat not found")
 	}
 	message.ChatID = chat.ID
 
+	//Поиск юзера по нику. Если не нашел, создать юзера и создать сообщение, связать их общим id
 	db = r.db.Where("name = ?", messageEntity.MessageAuthor).Limit(1).First(&user)
 	if db.RowsAffected == 0 {
 		user.ID = userId
 		user.Name = messageEntity.MessageAuthor
-		fmt.Println("11111")
 		r.db.Create(&user)
 		message.AuthorID = userId
 	} else {
+		//Если юзер существует, достать его id  связать его с моделью сообщения
 		message.AuthorID = user.ID
 	}
 
 	message.MessageText = messageEntity.MessageText
 	db = r.db.Create(&message)
-	fmt.Println("11111")
+
 	if db.Error != nil {
 		return db.Error
 	}
@@ -83,14 +84,15 @@ func (r *chatRepository) AddMessage(messageEntity *entity.Message) error {
 }
 
 func (r *chatRepository) GetListMessages(chatName string, limit int) (entity.ListIdMessages, error) {
-	chat := entity.Chat{}
+	chat := model.Chat{}
+	//chatEntity := entity.Chat{}
 	ListIdMessages := entity.ListIdMessages{}
 
 	db := r.db.Where("chat_name  = ?", chatName).First(&chat)
-
-	if db.Error != nil {
+	if db.RowsAffected == 0 {
 		return entity.ListIdMessages{}, errors.New("chat not found")
 	}
+	fmt.Println(chat)
 
 	db = r.db.Preload("Messages", func(db *gorm.DB) *gorm.DB {
 		return db.Where("chat_id = ?", chat.ID).Limit(limit).Order("messages.id DESC")
@@ -108,10 +110,30 @@ func (r *chatRepository) GetListMessages(chatName string, limit int) (entity.Lis
 }
 
 func (r *chatRepository) GetMessage(id int) (entity.Message, error) {
-	message := entity.Message{}
+	message := model.Message{}
+	chat := model.Chat{}
+	user := model.User{}
 	db := r.db.Where("id = ?", id).First(&message)
+
+	//db = r.db.Preload("Messages", func(db *gorm.DB) *gorm.DB {
+	//	return db.Where("id = ?", id)
+	//}).Find(&user)
+
+	db = r.db.Where("id = ?", message.AuthorID).First(&user)
+
+	db = r.db.Where("id = ?", message.ChatID).First(&chat)
+
+	messageEntity := entity.Message{
+		ID:            id,
+		ChatID:        chat.ID,
+		MessageAuthor: user.Name,
+		ChatName:      chat.ChatName,
+		MessageText:   message.MessageText,
+	}
+
+	fmt.Println(messageEntity)
 	if db.Error != nil {
 		return entity.Message{}, errors.New("message not found")
 	}
-	return message, nil
+	return messageEntity, nil
 }
