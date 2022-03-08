@@ -1,10 +1,13 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type Message struct {
-	ID          int
+	ID          uuid.UUID
 	AuthorID    uuid.UUID
 	ChatID      uuid.UUID
+	CreatedAt   string
 	MessageText string
 }

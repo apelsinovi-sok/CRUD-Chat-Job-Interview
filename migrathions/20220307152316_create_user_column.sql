@@ -17,10 +17,11 @@ CREATE TABLE chats (
 
 
 CREATE TABLE messages (
-    id INT GENERATED ALWAYS AS IDENTITY,
+    id UUID NOT NULL,
     chat_id UUID NOT NULL,
     author_id UUID NOT NULL,
     message_text VARCHAR(250),
+    created_at TIMESTAMP,
     PRIMARY KEY(id),
     CONSTRAINT fk_chats FOREIGN KEY(chat_id) REFERENCES chats(id) ON DELETE CASCADE,
     CONSTRAINT fk_author FOREIGN KEY(author_id) REFERENCES users(id) ON DELETE CASCADE

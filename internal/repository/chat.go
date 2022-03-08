@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"time"
 )
 
 type chatRepository struct {
@@ -49,9 +50,8 @@ func (r *chatRepository) CreateChat(chatEntity *entity.Chat) error {
 }
 
 func (r *chatRepository) AddMessage(messageEntity *entity.Message) error {
-	//chatEntity := entity.Chat{}
+	currentTime := time.Now()
 	chat := model.Chat{}
-	//userEntity := entity.User{}
 	user := model.User{}
 	message := model.Message{}
 	userId := uuid.New()
@@ -75,6 +75,8 @@ func (r *chatRepository) AddMessage(messageEntity *entity.Message) error {
 	}
 
 	message.MessageText = messageEntity.MessageText
+	message.CreatedAt = currentTime.Format("2006.01.02 15:04:05")
+	message.ID = uuid.New()
 	db = r.db.Create(&message)
 
 	if db.Error != nil {
@@ -95,7 +97,7 @@ func (r *chatRepository) GetListMessages(chatName string, limit int) (entity.Lis
 	fmt.Println(chat)
 
 	db = r.db.Preload("Messages", func(db *gorm.DB) *gorm.DB {
-		return db.Where("chat_id = ?", chat.ID).Limit(limit).Order("messages.id DESC")
+		return db.Where("chat_id = ?", chat.ID).Limit(limit).Order("messages.created_at DESC")
 	}).Find(&chat)
 
 	if db.Error != nil {
@@ -109,7 +111,7 @@ func (r *chatRepository) GetListMessages(chatName string, limit int) (entity.Lis
 	return ListIdMessages, nil
 }
 
-func (r *chatRepository) GetMessage(id int) (entity.Message, error) {
+func (r *chatRepository) GetMessage(id string) (entity.Message, error) {
 	message := model.Message{}
 	chat := model.Chat{}
 	user := model.User{}
@@ -129,6 +131,7 @@ func (r *chatRepository) GetMessage(id int) (entity.Message, error) {
 		MessageAuthor: user.Name,
 		ChatName:      chat.ChatName,
 		MessageText:   message.MessageText,
+		CreatedAt:     message.CreatedAt,
 	}
 
 	fmt.Println(messageEntity)

@@ -6,5 +6,5 @@ type Usecase interface {
 	CreateChat(chat entity.Chat) error
 	AddMessage(message entity.Message) error
 	GetListMessages(chatName string, limit int) (entity.ListIdMessages, error)
-	GetMessage(id int) (entity.Message, error)
+	GetMessage(id string) (entity.Message, error)
 }
