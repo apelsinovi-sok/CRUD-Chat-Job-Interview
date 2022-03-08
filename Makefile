@@ -19,6 +19,11 @@ endef
 server:
 	go run ./cmd/http/main.go
 
+.PHONY: deploy
+# Запуск приложения в докере
+deploy:
+	docker-compose -f ./my-network.yml up
+
 .PHONY: migrate
 # Запуск миграций goose
 # https://github.com/pressly/goose
