@@ -27,8 +27,8 @@ func (s *httpServer) setExternalParamInHandlers() {
 	})
 }
 
-func (s *httpServer) Run() {
-	err := s.router.Run()
+func (s *httpServer) Run(port string) {
+	err := s.router.Run(port)
 	if err != nil {
 		panic(err.Error())
 	}
