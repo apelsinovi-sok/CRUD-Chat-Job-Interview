@@ -1,5 +1,5 @@
-# если приложение разворачивается в докере изменить строку подключения к базе данных на :
-DATABASE_URL="host=localhost user=user password=123 dbname=postgres port=5432 sslmode=disable"
+# Если приложение разворачивается в докере изменить строку подключения к базе данных на :
+DATABASE_URL="host=localhost user=user password=123 dbname=postgres port=db:5432 sslmode=disable"
 
 # Описание эндпоинтов
 
