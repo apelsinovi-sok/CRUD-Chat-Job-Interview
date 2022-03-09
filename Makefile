@@ -12,7 +12,7 @@ define read_env_file
 	$(eval export sed 's/=.*//' ./.env)
 endef
 
-
+# команды для сборки
 
 .PHONY: server
 # Запуск локального сервера
@@ -20,9 +20,15 @@ server:
 	go run ./cmd/http/main.go
 
 .PHONY: deploy
-# Запуск приложения в докере
+# Запуск приложения в докере (не работает) (также необходимо изменить строку подключения к базе) (пример в редми)
 deploy:
 	docker-compose -f ./my-network.yml up
+
+
+.PHONY: postgres
+# Запуск отдельно postgres в докере
+postgres:
+	docker-compose -f ./docker/postgres.yml up
 
 .PHONY: migrate
 # Запуск миграций goose
