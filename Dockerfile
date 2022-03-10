@@ -11,8 +11,7 @@ RUN cd /app && go mod download
 
 COPY . .
 
-RUN go build /cmd/http/main.go
+RUN cd /app && make server
 
 EXPOSE 8080
 
-CMD ["./main"]
