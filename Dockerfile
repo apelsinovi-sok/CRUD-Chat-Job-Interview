@@ -1,17 +1,18 @@
 FROM golang:1.17
 
-COPY . /
+COPY . /app
 
 WORKDIR /
 
-COPY go.mod .
-COPY go.sum .
+COPY go.mod /app
+COPY go.sum /app
 
-RUN go mod download
+RUN cd /app && go mod download
 
 COPY . .
 
 RUN go build /cmd/http/main.go
+
 EXPOSE 8080
 
 CMD ["./main"]

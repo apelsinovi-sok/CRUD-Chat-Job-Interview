@@ -2,6 +2,7 @@ package http
 
 import (
 	"CRUD-Chat-Test-Task/internal/core/interfaces"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,6 +29,7 @@ func (s *httpServer) setExternalParamInHandlers() {
 }
 
 func (s *httpServer) Run(port string) {
+	port = fmt.Sprintf(":%s", port)
 	err := s.router.Run(port)
 	if err != nil {
 		panic(err.Error())

@@ -28,7 +28,7 @@ deploy:
 .PHONY: postgres
 # Запуск отдельно postgres в докере
 postgres:
-	docker-compose -f ./docker/postgres.yml up
+	docker-compose -f ./docker/postgres.yml up -d
 
 .PHONY: migrate
 # Запуск миграций goose
