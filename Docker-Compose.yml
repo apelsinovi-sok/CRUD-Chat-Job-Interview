@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  data:
+    image: postgres:13.3
+    restart: always
+    container_name: postgres-pg
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "123"
+    ports:
+      - "5432:5432"
+    networks:
+      - net
+
+  server:
+    build: ./Backend
+    container_name: backend
+    restart: always
+    ports:
+        - "8080:8080"
+    networks:
+        - net
+
+networks:
+  net:
+    driver: bridge

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"CRUD-Chat-Test-Task/infrastructure/configuration"
 	"flag"
 	"fmt"
 	_ "github.com/lib/pq"
@@ -12,7 +11,7 @@ import (
 
 var (
 	flags      = flag.NewFlagSet("goose", flag.ExitOnError)
-	dir        = flags.String("dir", "./migrations", "directory with migration files")
+	dir        = flags.String("dir", ".././migrate/migrations", "directory with migration files")
 	table      = flags.String("table", "goose_db_version", "migrations table name")
 	verbose    = flags.Bool("v", false, "enable verbose mode")
 	help       = flags.Bool("h", false, "print help")
@@ -21,8 +20,6 @@ var (
 )
 
 func main() {
-
-	config := configuration.New(".")
 
 	flags.Usage = usage
 	err := flags.Parse(os.Args[1:])
@@ -62,7 +59,7 @@ func main() {
 	}
 
 	args = mergeArgs(args)
-	driver, dbstring, command := "postgres", config.DatabaseUrl, args[0]
+	driver, dbstring, command := "postgres", "host=localhost user=user password=123 dbname=postgres port=5432 sslmode=disable", args[0]
 	db, err := goose.OpenDBWithDriver(driver, dbstring)
 	if err != nil {
 		log.Fatalf("-dbstring=%q: %v\n", dbstring, err)
