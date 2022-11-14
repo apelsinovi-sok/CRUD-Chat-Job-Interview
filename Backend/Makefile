@@ -15,15 +15,14 @@ endef
 # команды для сборки
 
 .PHONY: server
-# Запуск локального сервера
+# Запуск сервера нативно. Неоюходимо в .env поменяь хост подключениия к БД на localhost
 server:
 	go run ./cmd/http/main.go
 
 .PHONY: deploy
-# Запуск приложения в докере (не работает) (также необходимо изменить строку подключения к базе) (пример в редми)
+# Запуск сервер и базы данных в докере. Работает по умолчанию
 deploy:
-	docker-compose -f ./my-network.yml up
-
+	docker-compose -p chat-server up -d
 
 .PHONY: postgres
 # Запуск отдельно postgres в докере
@@ -32,13 +31,16 @@ postgres:
 
 .PHONY: migrate
 # Запуск миграций goose
+#Пример создания миграции таблицы users .././migrate/main.go users sql
 # https://github.com/pressly/goose
+
+# $(RUN_ARGS) принимает любые аргументы
 migrate:
-	go run ./cmd/migrate/main.go $(RUN_ARGS)
+	go run .././migrate/main.go $(RUN_ARGS)
 
 migrate-up:
-	go run ./cmd/migrate/main.go up
+	go run .././migrate/main.go up
 
 migrate-down:
-	go run ./cmd/migrate/main.go down
+	go run .././migrate/main.go down
 
