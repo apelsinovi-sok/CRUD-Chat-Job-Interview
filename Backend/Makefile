@@ -22,7 +22,7 @@ server:
 .PHONY: deploy
 # Запуск сервер и базы данных в докере. Работает по умолчанию
 deploy:
-	docker-compose -p chat-server up -d
+	docker-compose -f .././Docker-Compose.yml -p chat-server up -d
 
 .PHONY: postgres
 # Запуск отдельно postgres в докере
