@@ -15,19 +15,19 @@ endef
 # команды для сборки
 
 .PHONY: server
-# Запуск сервера нативно. Неоюходимо в .env поменяь хост подключениия к БД на localhost
+# Запуск сервера нативно. Необходимо в .env поменяь хост подключениия к БД на localhost
 server:
 	go run ./cmd/http/main.go
 
 .PHONY: deploy
 # Запуск сервер и базы данных в докере. Работает по умолчанию
 deploy:
-	docker-compose -f .././Docker-Compose.yml -p chat-server up -d
+	docker compose -f .././Docker-Compose.yml -p chat-server up -d
 
 .PHONY: postgres
 # Запуск отдельно postgres в докере
 postgres:
-	docker-compose -f ./docker/postgres.yml up -d
+	docker compose -f ./docker/postgres.yml up -d
 
 .PHONY: migrate
 # Запуск миграций goose
